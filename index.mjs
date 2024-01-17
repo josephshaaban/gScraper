@@ -4,7 +4,7 @@ import chromium from "@sparticuz/chromium";
 // const chromium = require("@sparticuz/chromium");
 
 export const handler = async (event) => {
-  var version, title;
+  var gData, pageTitle;
   try {
     const browser = await puppeteer.launch({
       args: [...chromium.args, "--no-sandbox"],
@@ -16,14 +16,56 @@ export const handler = async (event) => {
 
     const page = await browser.newPage();
 
-    await page.goto(
-      "https://docs.aws.amazon.com/cli/latest/userguide/getting-started-prereqs.html",
-      { waitUntil: "networkidle0" }
-    );
-    version = await browser.version();
-    title = await page.title();
-    console.log("Chromium:", version);
-    console.log("Page Title:", title);
+    const searchQuery = "Web3";
+    const params = {
+      rpcids: "HoAMBc",
+      "source-path": "/search",
+      bl: "boq_visualfrontendserver_20220505.05_p0",
+      hl: "en",
+      authuser: 0,
+    };
+    params.q = searchQuery;
+    const query = Object.entries(params)
+      .map(([key, val]) => `${key}=${encodeURIComponent(val)}`)
+      .join("&");
+    const url = `https://www.google.com/search?${query}`;
+
+    await page.goto(url, { waitUntil: "networkidle0" });
+    pageTitle = await page.title();
+
+    var gData = await page.evaluate(() => {
+      var data = [];
+
+      var titles = document.querySelectorAll("div.MjjYud");
+      console.log(titles);
+
+      titles.forEach((node) => {
+        var link = node
+          .querySelector('div>div[class="kb0PBd cvP2Ce jGGQ5e"]>div>div>span>a')
+          ?.getAttribute("href");
+        var sourceName = node.querySelector(
+          'div>div[class="kb0PBd cvP2Ce jGGQ5e"]>div>div>span>a>div>div>span'
+        )?.textContent;
+
+        var title = node.querySelector(
+          'div>div[class="kb0PBd cvP2Ce jGGQ5e"]>div>div>span>a>h3'
+        )?.textContent;
+        var description = node.querySelector(
+          'div>div[class="kb0PBd cvP2Ce"]'
+        )?.textContent;
+
+        if (title && link && description && sourceName) {
+          data.push({
+            title,
+            link,
+            description,
+            sourceName,
+          });
+        }
+      });
+
+      return data;
+    });
 
     await page.close();
 
@@ -35,15 +77,12 @@ export const handler = async (event) => {
     statusCode: 200,
     body: JSON.stringify(
       {
-        message: {
-          Chromium: version,
-          PageTitle: title,
-        },
-        input: event,
+        pageTitle,
+        data: gData,
+        // input: event,
       },
       null,
       2
     ),
   };
 };
-
