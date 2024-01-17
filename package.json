@@ -10,7 +10,7 @@
   "type": "module",
   "scripts": {
     "deploy": "sls deploy",
-    "test": "sls invoke local --function gscrapee --log"
+    "test": "sls invoke --function gscrapee --log"
   },
   "dependencies": {
     "puppeteer-core": "21.5.0"
