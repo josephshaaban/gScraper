@@ -1,5 +1,6 @@
 import * as puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
+import { getRandomInt } from "./utils.mjs";
 // const puppeteer = require("puppeteer-core");
 // const chromium = require("@sparticuz/chromium");
 
@@ -20,9 +21,11 @@ export const handler = async (event) => {
     const params = {
       rpcids: "HoAMBc",
       "source-path": "/search",
+      "f.sid": -getRandomInt(0, 9e10),
       bl: "boq_visualfrontendserver_20220505.05_p0",
       hl: "en",
       authuser: 0,
+      _reqid: -getRandomInt(0, 9e5),
     };
     params.q = searchQuery;
     const query = Object.entries(params)
