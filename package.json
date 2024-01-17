@@ -1,0 +1,23 @@
+{
+  "name": "gscrapee",
+  "version": "0.2.0",
+  "description": "This package demonstrates using @sparticuz/chromium as a devDependency with a layer that contains the binaries",
+  "license": "ISC",
+  "author": {
+    "name": "Youssef Shaaban"
+  },
+  "main": "index.mjs",
+  "type": "module",
+  "scripts": {
+    "deploy": "sls deploy",
+    "test": "sls invoke local --function gscrapee --log"
+  },
+  "dependencies": {
+    "puppeteer-core": "21.5.0"
+  },
+  "devDependencies": {
+    "@sparticuz/chromium": "119.0.2",
+    "serverless": "^3.27.0",
+    "serverless-offline": "^13.3.2"
+  }
+}

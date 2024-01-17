@@ -1,0 +1,27 @@
+org: devyosh
+app: lamn-gscrapper
+service: gscrapee
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+plugins:
+  - serverless-offline
+
+functions:
+  gscrapee:
+    handler: index.handler
+    layers:
+      - !Ref ChromiumtestLambdaLayer
+    events:
+      - httpApi:
+          path: /
+          method: get
+    timeout: 10
+
+layers:
+  chromiumtest:
+    package:
+      artifact: ./chromium-v119.0.2-layer.zip
