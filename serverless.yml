@@ -1,6 +1,6 @@
 org: devyosh
-app: lamn-gscrapper
-service: gscrapee
+app: lemn-gscrapper
+service: lemn-gscrapee
 frameworkVersion: "3"
 
 provider:
@@ -19,9 +19,10 @@ functions:
       - httpApi:
           path: /
           method: get
-    timeout: 10
+    timeout: 610
 
 layers:
   chromiumtest:
     package:
       artifact: ./chromium-v119.0.2-layer.zip
+
