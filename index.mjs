@@ -5,7 +5,7 @@ import { getRandomInt } from "./utils.mjs";
 // const chromium = require("@sparticuz/chromium");
 
 export const handler = async (event) => {
-  var gData, pageTitle;
+  var gData, pageTitle, isCaptcha;
   const loadImages = false;
   try {
     // Setup puppeteer browser
@@ -53,8 +53,9 @@ export const handler = async (event) => {
       isMobile: false,
     });
 
-    //
+    // Enable JavaScript on the page
     await page.setJavaScriptEnabled(true);
+    // Set navigation time to 0 milliseconds
     await page.setDefaultNavigationTimeout(0);
 
     // Avoid loading un-necessary
@@ -72,6 +73,13 @@ export const handler = async (event) => {
         }
       });
     }
+
+    // Set cookies to be more real agent
+    // await page.setCookie({
+    //   AEC: "Ae3NU9NQYeRRnnil4weJYhCWDSQs2agvRC6Z8Oz3KFmsGb_3CKNNlySktw",
+    //   "1P_JAR": "2024-01-19-00",
+    //   NID: "=511=kwHtkWnf6R-exFh8U7KqvQwzQZuUbaOoqeK6VxE_UkCpRnSjW0jXNlRoM6W94eQ0J8ihGvjabx7oFFlwRNvdgXp7k74xjaLAT_DyVPSX_5HR_qdsIOgEez0PlVd0wORUCdZY2RKcmm6jQWoT8ettkUP5yzeOIHjBXPbKVruAk9D5-pUSPA40DZ3pXvw8A0yHMme5SQC1Rw",
+    // });
 
     // Pass webdriver check
     await page.evaluateOnNewDocument(() => {
@@ -113,6 +121,15 @@ export const handler = async (event) => {
     });
 
     await page.goto(url, { waitUntil: "networkidle0" });
+
+    // Check for captch checkbox
+    // See https://stackoverflow.com/a/65721000
+    const frame = await page.frames().find((f) => f.name().startsWith("a-"));
+    captchaCheckbox = await frame.waitForSelector(
+      "div.recaptcha-checkbox-border"
+    );
+    isCaptcha = captchaCheckbox ? true : false;
+
     pageTitle = await page.title();
 
     // Crowling the google page and scrape search data
@@ -161,6 +178,7 @@ export const handler = async (event) => {
     body: JSON.stringify(
       {
         pageTitle,
+        captchaExists: isCaptcha,
         data: gData,
         // input: event,
       },
