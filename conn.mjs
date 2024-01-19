@@ -1,9 +1,17 @@
+import { config } from "dotenv";
+config("./.env");
 // Import the MongoDB driver
 import { MongoClient } from "mongodb";
 
+console.log("Loading env variables..");
+console.log({
+  ATLAS_USERNAME: process.env.ATLAS_USERNAME,
+  ATLAS_PASSWORD: process.env.ATLAS_PASSWORD,
+});
+
 // Using fake email to allow accessing atlas mongodb cluster
-const username = encodeURIComponent("nosot50836");
-const password = encodeURIComponent("6QAXND5UhtbtsxZg");
+const username = encodeURIComponent(process.env.ATLAS_USERNAME);
+const password = encodeURIComponent(process.env.ATLAS_PASSWORD);
 
 // Define our connection string
 const MONGODB_URI = `mongodb+srv://${username}:${password}@cluster0.kqbw20g.mongodb.net/?retryWrites=true&w=majority&maxIdleTimeMS=6000`;
