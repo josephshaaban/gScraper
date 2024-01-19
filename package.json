@@ -13,6 +13,8 @@
     "test": "sls invoke --function gscrapee --log"
   },
   "dependencies": {
+    "aws4": "^1.12.0",
+    "mongodb": "^6.3.0",
     "puppeteer-core": "21.5.0"
   },
   "devDependencies": {

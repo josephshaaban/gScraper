@@ -1,10 +1,24 @@
 import * as puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 import { getRandomInt } from "./utils.mjs";
-// const puppeteer = require("puppeteer-core");
-// const chromium = require("@sparticuz/chromium");
+import { connectToDatabase } from "./conn.mjs";
 
-export const handler = async (event) => {
+// Get an instance of our database
+const db = await connectToDatabase();
+
+export const handler = async (event, context) => {
+  /* 
+    By default, the callback waits until the runtime event loop is
+    empty before freezing the process and returning the results to
+    the caller. Setting this property to false requests that AWS Lambda
+    freeze the process soon after the callback is invoked, even if there
+    are events in the event loop. AWS Lambda will freeze the process, 
+    any state data, and the events in the event loop. Any remaining events
+    in the event loop are processed when the Lambda function is next
+    invoked, if AWS Lambda chooses to use the frozen process.
+  */
+  context.callbackWaitsForEmptyEventLoop = false;
+
   var gData, pageTitle, isCaptcha;
   const loadImages = false;
   try {
@@ -125,7 +139,7 @@ export const handler = async (event) => {
     // Check for captch checkbox
     // See https://stackoverflow.com/a/65721000
     const frame = await page.frames().find((f) => f.name().startsWith("a-"));
-    captchaCheckbox = await frame.waitForSelector(
+    const captchaCheckbox = await frame?.waitForSelector(
       "div.recaptcha-checkbox-border"
     );
     isCaptcha = captchaCheckbox ? true : false;
@@ -173,12 +187,17 @@ export const handler = async (event) => {
   } catch (error) {
     console.error(error);
   }
+
+  const result = await db.collection("gscrapee").insertMany(gData);
+  const dbInsertionSuccess = result ? true : false;
+
   return {
     statusCode: 200,
     body: JSON.stringify(
       {
         pageTitle,
         captchaExists: isCaptcha,
+        dbInsertionSuccess,
         data: gData,
         // input: event,
       },
