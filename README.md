@@ -1,20 +1,18 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in NodeJS'
-description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v3
-platform: AWS
-language: nodeJS
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Lemn gScraper
 
-# Serverless Framework Node HTTP API on AWS
+A simple scraping program for `google.com` that use given fingerprint, cookies, avoiding captcha technique.
 
-This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.
+## Setup
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
+Download or clone this repository.
+
+    $ git clone https://github.com/josephshaaban/gscrapee.git
+    $ cd gscrapee
+    $ curl https://github.com/Sparticuz/chromium/releases/download/v119.0.2/chromium-v119.0.2-layer.zip
+
+Create new file named `.env` and then provid required environment variables like `.env.example`
+
+**Note: The required credentials are in the file `.env.example`, but this step is demonstrating some security that we can address through development.**
 
 ## Usage
 
@@ -27,16 +25,26 @@ $ serverless deploy
 After deploying, you should see output similar to:
 
 ```bash
-Deploying aws-node-http-api-project to stage dev (us-east-1)
+Running "serverless" from node_modules
 
-✔ Service deployed to stack aws-node-http-api-project-dev (152s)
+Deploying lemn-gscrapee to stage dev (us-east-1, "default" provider)
+✔ Your AWS account is now integrated into Serverless Framework Observability
+✔ Serverless Framework Observability is enabled
 
-endpoint: GET - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
+✔ Service deployed to stack lemn-gscrapee-dev (115s)
+
+dashboard: https://app.serverless.com/******/apps/***********/lemn-gscrapee/dev/us-east-1
+endpoint: GET - https://8ypvkaqdy5.execute-api.us-east-1.amazonaws.com/
 functions:
-  hello: aws-node-http-api-project-dev-hello (1.9 kB)
+  gscrapee: lemn-gscrapee-dev-gscrapee (70 MB)
+layers:
+  chromiumtest: arn:aws:lambda:us-east-1:299143158254:layer:chromiumtest:3
 ```
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [http event docs](https://www.serverless.com/framework/docs/providers/aws/events/apigateway/).
+_Note_: You can use my deployed API, by using `Postman HTTP GET request` or calling the following `cmd` command:
+```bash
+curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
+```
 
 ### Invocation
 
@@ -46,47 +54,32 @@ After successful deployment, you can call the created application via HTTP:
 curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
 ```
 
-Which should result in response similar to the following (removed `input` content for brevity):
+Which should result in response similar to the following:
 
 ```json
 {
-  "message": "Go Serverless v2.0! Your function executed successfully!",
-  "input": {
-    ...
-  }
+  "pageTitle": "Web3 - Google Search",
+  "captchaExists": false,
+  "dbInsertionSuccess": true,
+  "data": [
+    {
+      "title": "Web3",
+      "link": "https://en.wikipedia.org/wiki/Web3",
+      "description": "Web3 is an idea for a new iteration of the World Wide Web which incorporates concepts such as decentralization, blockchain technologies, and token-based ...",
+      "sourceName": "Wikipedia",
+      "_id": "65a9e94abcb68848fffbd3c8"
+    },
+    ...,
+    {
+      "title": "What Is Web3?",
+      "link": "https://hbr.org/2022/05/what-is-web3",
+      "description": "May 10, 2022 — Put very simply, Web3 is an extension of cryptocurrency, using blockchain in new ways to new ends. A blockchain can store the number of tokens ...",
+      "sourceName": "Harvard Business Review",
+      "_id": "65a9e94abcb68848fffbd3c9"
+    }
+  ]
 }
 ```
 
-### Local development
-
-You can invoke your function locally by using the following command:
-
-```bash
-serverless invoke local --function hello
-```
-
-Which should result in response similar to the following:
-
-```
-{
-  "statusCode": 200,
-  "body": "{\n  \"message\": \"Go Serverless v3.0! Your function executed successfully!\",\n  \"input\": \"\"\n}"
-}
-```
-
-
-Alternatively, it is also possible to emulate API Gateway and Lambda locally by using `serverless-offline` plugin. In order to do that, execute the following command:
-
-```bash
-serverless plugin install -n serverless-offline
-```
-
-It will add the `serverless-offline` plugin to `devDependencies` in `package.json` file as well as will add it to `plugins` in `serverless.yml`.
-
-After installation, you can start local emulation with:
-
-```
-serverless offline
-```
-
-To learn more about the capabilities of `serverless-offline`, please refer to its [GitHub repository](https://github.com/dherault/serverless-offline).
+## Checking stored data
+Simply, you can use my temperory Atlas cluster through the required credentials in the file `.env.example`
